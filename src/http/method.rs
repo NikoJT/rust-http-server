@@ -4,6 +4,7 @@ use std::str::FromStr;
 // Enums for Method
 // Enums are just number GET = 1 and so on,
 // Sugaring to hide "magical numbers"
+#[derive(Debug)]
 pub enum Method {
     GET,
     PUT,
@@ -17,6 +18,7 @@ pub enum Method {
 }
 
 // Implement FromStr trait for Method
+// To convert into pattern
 impl FromStr for Method {
     type Err = MethodError;
     // from_str required by FormStr trait
@@ -36,4 +38,4 @@ impl FromStr for Method {
     }
 }
 
-pub struct MethodError {}
+pub struct MethodError;
