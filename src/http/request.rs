@@ -8,11 +8,11 @@ use std::fmt::{Result as FmtResult, Debug, Display, Formatter};
 use std::str::Utf8Error;
 
 // Struct for Request
-pub struct Request {
-    path: String,
+pub struct Request<'buffer> {
+    path: &'buffer str,
     // Rust does not have a Null, therefore it needs to represent absence of value
     // Option type which has either Some or None.
-    query_string: Option<String>,
+    query_string: Option<&'buffer str>,
     method: Method,
 }
 
@@ -25,11 +25,12 @@ pub struct Request {
 // TryFrom is safe and can fail, From can not fail.
 // Traits work like interface abstractions in other languages.
 // TryInto trait is coming for free with TryFrom trait.
-impl TryFrom<&[u8]> for Request {
+impl<'buffer> TryFrom<&'buffer [u8]> for Request<'buffer> {
     type Error = ParseError;
 
     // GET /search?name=abc&sort=1 HTTP/1.1
-    fn try_from(buffer: &[u8]) -> Result<Self, Self::Error> {
+
+    fn try_from(buffer: &'buffer [u8]) -> Result<Request<'buffer>, Self::Error> {
 
         // The question mark operator in rust is used as an error propagation
         // alternative to functions that return Result OR Option types.
@@ -64,6 +65,7 @@ impl TryFrom<&[u8]> for Request {
 
         let method: Method = method.parse()?;
         let mut query_string = None;
+        /*
         match path.find("?") {
             Some(i) => {
                 // i + 1 is bytes, but we know ? is exactly one byte in size. so code is valid.
@@ -72,7 +74,25 @@ impl TryFrom<&[u8]> for Request {
             },
             None() => {}
         }
-        unimplemented!();
+
+        let q = path.find('?');
+        if q.is_some() {
+            // unwrap cannot fail, if it fails causes exit.
+            let i = q.unwrap();
+            query_string = Some(&path[i + 1..]);
+            path = &path[..i];
+        }
+        // Same as the solution below, just more efficient / less code / more readable.
+        */
+        if let Some(i) = path.find('?') {
+            query_string = Some(&path[i + 1..]);
+            path = &path[..i];
+        }
+        Ok(Self{
+            path,
+            query_string,
+            method
+        })
     }
 }
 
