@@ -55,7 +55,7 @@ impl TryFrom<&[u8]> for Request {
         // we are overriding request variable with variable shadowing
         // get_next_word returns the remaining string which is then set to the shadowing request
         let (method, request) = get_next_word(request).ok_or(ParseError::InvalidRequestError)?;
-        let (path, request) = get_next_word(request).ok_or(ParseError::InvalidRequestError)?;
+        let (mut path, request) = get_next_word(request).ok_or(ParseError::InvalidRequestError)?;
         let (protocol, _) = get_next_word(request).ok_or(ParseError::InvalidRequestError)?;
 
         if protocol != "HTTP/1.1" {
@@ -63,6 +63,15 @@ impl TryFrom<&[u8]> for Request {
         }
 
         let method: Method = method.parse()?;
+        let mut query_string = None;
+        match path.find("?") {
+            Some(i) => {
+                // i + 1 is bytes, but we know ? is exactly one byte in size. so code is valid.
+                query_string = Some(&path[i + 1..]);
+                path = &path[..i];
+            },
+            None() => {}
+        }
         unimplemented!();
     }
 }
