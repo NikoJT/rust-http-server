@@ -6,13 +6,14 @@ use std::convert::TryFrom;
 use std::error::Error;
 use std::fmt::{Result as FmtResult, Debug, Display, Formatter};
 use std::str::Utf8Error;
+use super::QueryString;
 
 // Struct for Request
 pub struct Request<'buffer> {
     path: &'buffer str,
     // Rust does not have a Null, therefore it needs to represent absence of value
     // Option type which has either Some or None.
-    query_string: Option<&'buffer str>,
+    query_string: Option<QueryString<'buffer>>,
     method: Method,
 }
 
@@ -85,7 +86,7 @@ impl<'buffer> TryFrom<&'buffer [u8]> for Request<'buffer> {
         // Same as the solution below, just more efficient / less code / more readable.
         */
         if let Some(i) = path.find('?') {
-            query_string = Some(&path[i + 1..]);
+            query_string = Some(QueryString::from(&path[i + 1..]));
             path = &path[..i];
         }
         Ok(Self{
