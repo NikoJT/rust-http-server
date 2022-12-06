@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 pub struct QueryString<'buffer> {
-    data: Hashmap<&'buffer str, Value<'buffer>>
+    data: HashMap<&'buffer str, Value<'buffer>>
 }
 
 //enum variant to save either sting or array of strings.
@@ -19,17 +19,25 @@ impl<'buffer> QueryString<'buffer> {
 }
 
 impl<'buffer> From<&'buffer str> for QueryString<'buffer> {
-    fn from(_: &'buffer str) -> Self {
+    fn from(s: &'buffer str) -> Self {
         let mut data = HashMap::new();
 
         for sub_string in s.split("&") {
             let  mut key = sub_string;
             let  mut value = "";
-            if let Some(i) = s.find('=') {
+            if let Some(i) = sub_string.find('=') {
                 key = &sub_string[..i];
                 value = &sub_string[i + 1..];
             }
+            data.entry(key)
+                .and_modify(|existing: &mut Value| match existing {
+                    Value::Single(prev_value) => {
+                        *existing = Value::Multiple(vec![prev_value, value]);
+                    }
+                    Value::Multiple(vec) => vec.push(value),
+                })
+                .or_insert(Value::Single(value));
         }
-        Querystring { data }
+        QueryString { data }
     }
 }
