@@ -115,8 +115,8 @@ fn get_next_word(request: &str) -> Option<(&str, &str)> {
 
     // for loop syntax
     // enumerate yields index and character in every iteration
-    for (i, c) in request.chars().enumerate() {
-        if c == ' ' || c == '\r' {
+    for (index, char) in request.chars().enumerate() {
+        if char == ' ' || char == '\r' {
             // some wrapping tuple with two string slices.
             // first will be the word we want
             // all strings in rust needs to be valid utf8
@@ -129,8 +129,8 @@ fn get_next_word(request: &str) -> Option<(&str, &str)> {
             // if in &request[i + 1..] next is an character longer than one byte
             // in this loop this is still safe & valid, due to the space
             // on the control flow statement that mandates the space is at the position of the
-            // index i so we can safely assume it is exactly one byte in size.
-            return Some((&request[..i], &request[i + 1..]))
+            // index i so we can safely assume it is exactly one byte in size. 
+            return Some((&request[..index], &request[index + 1..]))
         }
     }
     unimplemented!();
