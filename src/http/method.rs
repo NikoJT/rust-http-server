@@ -1,6 +1,6 @@
 // used to convert string to enum
 use std::str::FromStr;
-
+use std::fmt::Debug;
 // Enums for Method
 // Enums are just number GET = 1 and so on,
 // Sugaring to hide "magical numbers"

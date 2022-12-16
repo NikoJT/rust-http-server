@@ -8,6 +8,7 @@ use std::fmt::{Result as FmtResult, Debug, Display, Formatter};
 use std::str::Utf8Error;
 use super::QueryString;
 
+#[derive(Debug)]
 // Struct for Request
 pub struct Request<'buffer> {
     path: &'buffer str,

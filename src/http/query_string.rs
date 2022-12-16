@@ -1,9 +1,13 @@
 use std::collections::HashMap;
+use std::fmt::Debug;
+
+#[derive(Debug)]
 pub struct QueryString<'buffer> {
     data: HashMap<&'buffer str, Value<'buffer>>
 }
 
 //enum variant to save either sting or array of strings.
+#[derive(Debug)]
 pub enum Value<'buffer> {
     Single(&'buffer str),
     // Array length is specified at compile time,
