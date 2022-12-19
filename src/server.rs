@@ -1,7 +1,7 @@
 // include traits to use them.
 use std::convert::TryFrom;
 // use std::convert::TryInto;
-use std::io::Read;
+use std::io::{Write, Read};
 use std::net::TcpListener;
 // Crate is called from root module, main
 use crate::http::Request;
@@ -44,6 +44,7 @@ impl Server {
                             match Request::try_from(&buffer[..]) {
                                 Ok(request) => {
                                     dbg!(request);
+                                    write!(stream, "HTTP/1.1 404 Not Found\r\n\r\n");
                                 },
                                 Err(e) => println!("Failed to parse a request {}", e)
                             }

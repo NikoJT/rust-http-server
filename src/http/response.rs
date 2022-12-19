@@ -1,10 +1,6 @@
 use super::StatusCode;
 
 #[derive(Debug)]
-enum StatusCode {
-
-}
-
 pub struct Response {
     status_code: StatusCode,
     body: Option<String>,
