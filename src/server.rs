@@ -1,10 +1,10 @@
+use crate::http::{Request, Response, StatusCode};
 // include traits to use them.
 use std::convert::TryFrom;
 // use std::convert::TryInto;
-use std::io::{Write, Read};
+use std::io::Read;
 use std::net::TcpListener;
 // Crate is called from root module, main
-use crate::http::Request;
 
 pub struct Server {
     addr: String,
@@ -29,7 +29,7 @@ impl Server {
                     // 1024 one kilobyte is enough for a test.
                     let mut buffer = [0; 1024];
                     // convert buffer byte array in to a request.
-                    match stream.read(&mut buffer) {
+                    let response = match stream.read(&mut buffer) {
                         Ok(_) => {
                             println!("Received a request: {}", String::from_utf8_lossy(&buffer));
                             // Result wrapping a request
@@ -41,16 +41,22 @@ impl Server {
                             // Emit lower and upper bounds with [..] to create a bite slice that
                             // Contains the entire array.
                             // Same as Request::try_from(&buffer as &[u8])
-                            match Request::try_from(&buffer[..]) {
+                            let response = match Request::try_from(&buffer[..]) {
                                 Ok(request) => {
                                     dbg!(request);
-                                    write!(stream, "HTTP/1.1 404 Not Found\r\n\r\n");
+                                    Response::new(StatusCode::Ok, Some("<h1> IT WORKS! </h1>".to_string()))
                                 },
-                                Err(e) => println!("Failed to parse a request {}", e)
+                                Err(e) => { 
+                                    println!("Failed to parse a request {}", e);
+                                    Response::new(StatusCode::BadRequest, None)
+                                }
+                            };
+                            if let Err(e) = response.send(&mut stream) {
+                                println!("Failed to send response");
                             }
                         }
                         Err(e) => println!("Failed to read from connection {}", e)
-                    }
+                    };
                 }
                 Err(err) => println!("Failed to establish a connection: {}", err)
             }
