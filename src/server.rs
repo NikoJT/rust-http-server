@@ -12,11 +12,11 @@ pub struct Server {
 
 pub trait Handler {
     fn handle_request(&mut self, request: &Request) -> Response {
-
+        Response::new(StatusCode::Ok, Some("<h1>Test</h1>".to_string()))
     }
-    fn handle_bad_request(&mut self, error: &ParseError) -> Repsonse {
-        println!("Failed to parse request: {}", e);
-        Response::new(StatusCode::BadRequest, None);
+    fn handle_bad_request(&mut self, error: &ParseError) -> Response {
+        println!("Failed to parse request: {}", error);
+        Response::new(StatusCode::BadRequest, None)
     }
 }
 
@@ -52,15 +52,10 @@ impl Server {
                             // Contains the entire array.
                             // Same as Request::try_from(&buffer as &[u8])
                             let response = match Request::try_from(&buffer[..]) {
-                                Ok(request) => {
-                                    dbg!(request);
-                                    handler.handle_request(&request)
-                                },
-                                Err(e) => { 
-                                    println!("Failed to parse a request {}", e);
-                                    handler.handle_bad_request(&e)
-                                }
+                                Ok(request) => handler.handle_request(&request),
+                                Err(e) => handler.handle_bad_request(&e),
                             };
+
                             if let Err(e) = response.send(&mut stream) {
                                 println!("Failed to send response");
                             }

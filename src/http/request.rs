@@ -18,6 +18,20 @@ pub struct Request<'buffer> {
     method: Method,
 }
 
+impl<'buffer> Request<'buffer> {
+    pub fn path(&self) -> &str {
+        &self.path()
+    }
+
+    pub fn method(&self) -> &Method {
+        &self.method()
+    }
+
+    pub fn query_string(&self) -> Option<&QueryString> {
+        self.query_string.as_ref()
+    }
+}
+
 // Seems ok, but std library has a module called convert which is dedicated for type conversions.
 // impl Request {
 //     fn from_byte_array(buffer: &[u8]) -> Result<Self, String> {}
