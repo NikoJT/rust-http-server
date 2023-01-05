@@ -13,11 +13,11 @@ impl Response {
     }    
     // Static dispatch with &mut impl Write
     // resolved at compile time. compile will resolve all concrete implementations
-    // we will use. It will look every parameter that can be passed to this function.
-    // Throughout this codebase the compiler will look at the type that we're calling this 
+    // that are  used. It will look every parameter that can be passed to this function.
+    // Throughout this codebase the compiler will look at the type that is calling this 
     // function with and for every different concrete type were calling the function with.
     // the compiler will copy the function and type it with the type its called.
-    // at compile time compiler will see that were calling it with TcpStream
+    // at compile time compiler will see that it is called with TcpStream
     // And will generate a function that is populated with the used type
     // This will reduce runtime cost and overhead and there wont be need for a V table
     // Main downside of this however is that compiler will take longer to compile 

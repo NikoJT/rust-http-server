@@ -11,9 +11,7 @@ pub struct Server {
 }
 
 pub trait Handler {
-    fn handle_request(&mut self, request: &Request) -> Response {
-        Response::new(StatusCode::Ok, Some("<h1>Test</h1>".to_string()))
-    }
+    fn handle_request(&mut self, request: &Request) -> Response;
     fn handle_bad_request(&mut self, error: &ParseError) -> Response {
         println!("Failed to parse request: {}", error);
         Response::new(StatusCode::BadRequest, None)
@@ -32,14 +30,16 @@ impl Server {
 
     pub fn run(self,  mut handler: impl Handler) {
         println!("Listening on {} 👂🏼", self.addr);
+
         let listener = TcpListener::bind(&self.addr).unwrap();
+
         loop {
             match listener.accept() {
                 Ok((mut stream, _)) => {
                     // 1024 one kilobyte is enough for a test.
                     let mut buffer = [0; 1024];
                     // convert buffer byte array in to a request.
-                    let response = match stream.read(&mut buffer) {
+                    match stream.read(&mut buffer) {
                         Ok(_) => {
                             println!("Received a request: {}", String::from_utf8_lossy(&buffer));
                             // Result wrapping a request
@@ -60,19 +60,11 @@ impl Server {
                                 println!("Failed to send response");
                             }
                         }
-                        Err(e) => println!("Failed to read from connection {}", e)
-                    };
+                        Err(e) => println!("Failed to read from connection {}", e),
+                    }
                 }
-                Err(err) => println!("Failed to establish a connection: {}", err)
+                Err(err) => println!("Failed to establish a connection: {}", err),
             }
-
-            let res = listener.accept();
-
-            if res.is_err() {
-                continue;
-            }
-
-            let (stream, addr) = res.unwrap();
         }
     }
 }
